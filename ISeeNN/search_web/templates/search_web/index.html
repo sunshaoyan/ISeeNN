@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8"></head>
+    <title>ISEE NN</title>
+<body>
+<form action="{% url 'search_web:upload' %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="image_file" />
+    <input type="submit" />
+</form>
+</body>
+</html>

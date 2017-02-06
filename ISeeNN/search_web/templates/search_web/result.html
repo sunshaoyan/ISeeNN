@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <title>ISEE NN Results</title>
+    {% load staticfiles %}
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="{% static "search_web/js/result_arrange.js" %}"></script>
+    <link rel="stylesheet" href="{% static "search_web/css/result_arrange.css"%}">
+</head>
+<body>
+{% if query_image %}
+<div id="showimg">
+The Query You Uploaded: <br/>
+    <a href="{% url 'search_web:user_image' id=query_image %}">
+        <img src="{% url 'search_web:user_image_thumbnail' id=query_image thumbnail='thumbnail' %}" alt="" height="200">
+    </a>
+</div>
+<div>
+    Query time: {{ time }}s
+</div>
+<div id="results">
+    {% for result in results %}
+    <img class="list"
+         src="{% url 'search_web:get_thumbnail' result.id %}"
+         data-width="{{ result.width }}"
+         data-height="{{ result.height }}"
+         title="{{ result.score }}"
+    />
+    {% endfor %}
+</div>
+{% endif %}
+
+</body>
+</html>
