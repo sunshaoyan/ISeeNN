@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ISee NN Detail</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static "search_web/css/detail.css"%}">
+</head>
+<body>
+<h3>Query Image v.s. Database Image</h3>
+<div class="container">
+    {% if from_db %}
+        <img src="{% url 'search_web:get_thumbnail' id=user_upload_image_id %}" alt="">
+    {% else %}
+        <img src="{% url 'search_web:user_image_thumbnail' id=user_upload_image_id thumbnail='thumbnail'%}" alt="">
+    {% endif %}
+    <img src="{% url 'search_web:get_thumbnail' id=db_image.id %}" alt="">
+    <div style="clear:both"></div>
+</div>
+<div class="details">
+    <p>Similarity Score = {{ similarity }}</p>
+    <p><a href="{% url 'search_web:result_from_db' id=db_image.id from_db='from_db'%}">Click</a> to Search with this database image.</p>
+    <p>
+        Info: width = {{ db_image.width }}, height = {{ db_image.height }}{% if db_image.source %}, Source = {{ db_image.source }}{% endif %}
+    </p>
+    <img src="{% url 'search_web:get_image' id=db_image.id %}" alt="">
+</div>
+</body>
+</html>

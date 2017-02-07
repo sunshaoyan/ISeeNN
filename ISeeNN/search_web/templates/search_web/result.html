@@ -10,23 +10,40 @@
 </head>
 <body>
 {% if query_image %}
+<form action="{% url 'search_web:upload' %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="image_file" />
+    <input type="submit" />
+</form>
 <div id="showimg">
 The Query You Uploaded: <br/>
-    <a href="{% url 'search_web:user_image' id=query_image %}">
-        <img src="{% url 'search_web:user_image_thumbnail' id=query_image thumbnail='thumbnail' %}" alt="" height="200">
-    </a>
+    {% if from_db %}
+         <a href="{% url 'search_web:get_image' id=query_image %}" target="_blank">
+            <img src="{% url 'search_web:get_thumbnail' id=query_image %}" alt="" height="200">
+        </a>
+    {% else %}
+        <a href="{% url 'search_web:user_image' id=query_image %}" target="_blank">
+            <img src="{% url 'search_web:user_image_thumbnail' id=query_image thumbnail='thumbnail' %}" alt="" height="200">
+        </a>
+    {% endif %}
 </div>
 <div>
     Query time: {{ time }}s
 </div>
 <div id="results">
     {% for result in results %}
-    <img class="list"
-         src="{% url 'search_web:get_thumbnail' result.id %}"
-         data-width="{{ result.width }}"
-         data-height="{{ result.height }}"
-         title="{{ result.score }}"
-    />
+        {% if from_db %}
+            <a href="{% url 'search_web:detail_from_db' result.id query_image from_db%}">
+        {% else %}
+            <a href="{% url 'search_web:detail' result.id query_image %}">
+        {% endif %}
+            <img class="list"
+                 src="{% url 'search_web:get_thumbnail' result.id %}"
+                 data-width="{{ result.width }}"
+                 data-height="{{ result.height }}"
+                 title="{{ result.score }}"
+            />
+        </a>
     {% endfor %}
 </div>
 {% endif %}

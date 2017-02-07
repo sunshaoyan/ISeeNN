@@ -56,6 +56,8 @@ class DBImage(Document):
 
 class UserUploadImage(Document):
     data = fields.ImageField(required=True, size=(1024, 1024), thumbnail_size=(640, 200))
+    feature = fields.BinaryField()
+    identity = fields.StringField()
 
 
 class ImageUploadForm(forms.Form):

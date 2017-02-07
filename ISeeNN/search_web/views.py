@@ -43,11 +43,16 @@ class SearchEngine:
         return SearchEngine.index.size
 
     @staticmethod
-    def query(image_path):
+    def query(feat=None):
+        results = exec_query(SearchEngine.index, feat.tolist(), settings.MAX_RETURN_ITEM)
+        return results
+
+    @staticmethod
+    def extract(image_path):
         feat = SearchEngine.extractor.extract(image_path)
         feat = SearchEngine.normalizer.normalize(feat)
-        results = exec_query(SearchEngine.index, feat[0].tolist(), settings.MAX_RETURN_ITEM)
-        return results
+        return feat
+
 
 def get_image(request, id):
     try:
@@ -68,6 +73,7 @@ def get_image(request, id):
     except:
         return HttpResponseGone("Image Moved")
 
+
 def get_thumbnail(request, id):
     try:
         db_image = DBImage.objects.get(id=id)
@@ -87,6 +93,7 @@ def get_thumbnail(request, id):
     except:
         return HttpResponseGone("Image Moved")
 
+
 def user_image(request, id, thumbnail=None):
     try:
         user_image = UserUploadImage.objects.get(id=id)
@@ -98,12 +105,15 @@ def user_image(request, id, thumbnail=None):
     except UserUploadImage.DoesNotExist:
         raise Http404("Image Not Found")
 
+
 def index(request):
     return render(request, 'search_web/index.html')
+
 
 def get_image_meta(id):
     dbimage = DBImage.objects.get(pk=id)
     return (dbimage.width, dbimage.height)
+
 
 class ResultMeta:
     def __init__(self, id, score, width, height):
@@ -113,25 +123,41 @@ class ResultMeta:
         self.height = height
 
 
+def result(request, id, from_db=None):
+    try:
+        if from_db == 'from_db':
+            feature_db_image = Feature.objects.get(image=id, identity=settings.FEATURE_IDENTITY)
+            feat_query = np.frombuffer(feature_db_image.data, dtype='float32')
+        else:
+            user_upload_image = UserUploadImage.objects.get(id=id)
+            feat_query = np.frombuffer(user_upload_image.feature, dtype='float32')
+        start_time = time.time()
+        search_results = SearchEngine.query(feat=feat_query)
+        end_time = time.time()
+        results = []
+        for item in search_results:
+            (w, h) = get_image_meta(item.id)
+            results.append(ResultMeta(item.id, item.score, w, h))
+        return render(request, 'search_web/result.html', {
+            'query_image': id,
+            'time': '%.2f' % (end_time - start_time),
+            'results': results,
+            'from_db': from_db,
+        })
+    except (UserUploadImage.DoesNotExist, Feature.DoesNotExist):
+        raise Http404("Page Not Found")
+
+
 def handle_uploaded_image(request):
     image_file = request.FILES['image_file']
     user_upload_image = UserUploadImage()
     user_upload_image.data.put(image_file)
+    feat_query = SearchEngine.extract(user_upload_image.data.get())
+    user_upload_image.feature = feat_query.tobytes()
+    user_upload_image.identity = settings.FEATURE_IDENTITY
     user_upload_image.save()
+    return HttpResponseRedirect(reverse('search_web:result', kwargs={'id': str(user_upload_image.pk)}))
 
-    start_time = time.time()
-    search_results = SearchEngine.query(user_upload_image.data.get())
-    end_time = time.time()
-    results = []
-    for item in search_results:
-        (w, h) = get_image_meta(item.id)
-        results.append(ResultMeta(item.id, item.score, w, h))
-    query_image = str(user_upload_image.pk)
-    return render(request, 'search_web/result.html', {
-        'query_image': query_image,
-        'time': '%.2f' % (end_time - start_time),
-        'results': results
-    })
 
 def upload(request):
     if request.method == 'POST':
@@ -143,5 +169,30 @@ def upload(request):
             return HttpResponseRedirect(reverse('search_web:index'))
     return HttpResponseRedirect(reverse('search_web:index'))
 
-# def result(request):
-#     return render(request, 'search_web/result.html')
+
+def detail(request, image_id, user_upload_id, from_db=None):
+    try:
+        db_image = DBImage.objects.get(id=image_id)
+        if from_db is None:
+            user_upload_image = UserUploadImage.objects.get(id=user_upload_id)
+            if user_upload_image.feature is None or user_upload_image.identity != settings.FEATURE_IDENTITY:
+                feat_user_image = SearchEngine.extract(user_upload_image.data.get())
+            else:
+                feat_user_image = np.frombuffer(user_upload_image.feature, dtype='float32')
+        else:
+            feature_user_image = Feature.objects.get(image=user_upload_id, identity=settings.FEATURE_IDENTITY)
+            feat_user_image = np.frombuffer(feature_user_image.data, dtype='float32')
+        feature_db_image = Feature.objects.get(image=image_id, identity=settings.FEATURE_IDENTITY)
+        feat_db_image = np.frombuffer(feature_db_image.data, dtype='float32')
+        similarity = np.inner(feat_db_image, feat_user_image)
+        return render(request, 'search_web/detail.html', {
+            'similarity': '%.4f' % similarity,
+            'user_upload_image_id': user_upload_id,
+            'db_image': db_image,
+            'from_db': from_db
+        })
+    except (DBImage.DoesNotExist, UserUploadImage.DoesNotExist):
+        raise Http404
+    except Feature.DoesNotExist:
+        return HttpResponseServerError("Feature does not exist")
+
