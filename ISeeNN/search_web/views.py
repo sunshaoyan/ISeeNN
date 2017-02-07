@@ -20,7 +20,7 @@ def load_index(identity):
     print("loading index...")
     print("This may take a while.")
     index = Index()
-    for feature in Feature.objects(identity=identity).all():
+    for feature in Feature.objects(identity=identity):
         vec = np.frombuffer(feature.data, dtype='float32')
         push_index_item(index, str(feature.image), vec.tolist())
     print("loaded %d index items." % (index.size))
@@ -46,7 +46,7 @@ class SearchEngine:
     def query(image_path):
         feat = SearchEngine.extractor.extract(image_path)
         feat = SearchEngine.normalizer.normalize(feat)
-        results = exec_query(SearchEngine.index, feat[0].tolist())
+        results = exec_query(SearchEngine.index, feat[0].tolist(), settings.MAX_RETURN_ITEM)
         return results
 
 def get_image(request, id):
