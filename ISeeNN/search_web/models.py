@@ -42,12 +42,14 @@ class DBImage(Document):
     mime_type = fields.StringField(required=True)
     width = fields.IntField(required=True)
     height = fields.IntField(required=True)
+    source = fields.StringField()
     meta = {
         'indexes': [
             {
                 'fields': ['path'],
                 'unique': True
-            }
+            },
+            '#source'
         ]
     }
 
