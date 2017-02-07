@@ -16,7 +16,10 @@ class Extractor(metaclass=ABCMeta):
             self._build_model()
 
     def _get_feature(self, img):
-        with tf.Session(graph=self._graph) as sess:
+        config = tf.ConfigProto(
+            device_count = {'GPU': 0}
+        )
+        with tf.Session(graph=self._graph, config=config) as sess:
             batch = img.reshape((1, img.shape[0], img.shape[1], 3))
             feed_dict = {self._inputs: batch}
             output = sess.run(self._model.output, feed_dict=feed_dict)

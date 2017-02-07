@@ -4,6 +4,8 @@
 
 #include "Query.h"
 #include <iostream>
+#include <algorithm>
+using namespace std;
 
 Query::Query(Index* index) : m_index(index) {
 
@@ -22,7 +24,7 @@ vector<ScoreItem> Query::exec(const vector<float> &query_feature, size_t return_
         score_items[i].id = m_index->get_id(i);
         score_items[i].score = score;
     }
-    auto cmp = [](ScoreItem &a, ScoreItem &b) { return a.score > b.score; };
+    auto cmp = [](const ScoreItem &a, const ScoreItem &b) { return a.score > b.score; };
     sort(score_items.begin(), score_items.end(), cmp);
     if (return_list_size > 0 && return_list_size < score_items.size()) {
         score_items.resize(return_list_size);

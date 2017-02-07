@@ -137,3 +137,4 @@ INPUT_TYPE = 'RESIZE' # options are: RESIZE, NO_RESIZE
 INPUT_SIZE = (224, 224) # required only if INPUT_TYPE == RESIZE
 NORMALIZER_TYPE = 'ROOT' # options are: ROOT, L2
 FEATURE_IDENTITY = 'VGG16P5_resize' # should be consistent with FEATURE_MODEL and INPUT_TYPE
+MAX_RETURN_ITEM = 300 # set as 0 if you want retrieve all. WARNING this may cause your browser crash if the database size is large
