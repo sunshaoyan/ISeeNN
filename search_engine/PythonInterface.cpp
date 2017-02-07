@@ -8,11 +8,12 @@
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <boost/python/stl_iterator.hpp>
+#include <string>
 
 using namespace boost::python;
 
 
-void push_index_item(const boost::python::object& index_obj, string id, const boost::python::list& feat)
+void push_index_item(const boost::python::object& index_obj, const char* id, const boost::python::list& feat)
 {
     Index* index = boost::python::extract<Index*>(index_obj);
     std::vector<float> v = std::vector<float>(boost::python::stl_input_iterator<float>(feat),
