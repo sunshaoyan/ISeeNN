@@ -2,8 +2,8 @@ import sys
 import os
 from PIL import Image
 
-project_root = '..'
-sys.path.append(project_root)
+project_root = '../ISeeNN'
+sys.path.append('../')
 sys.path.append(os.path.join(project_root, 'search_web'))
 
 from feature_extractor import ResizeExtractor, RootNormalizer
