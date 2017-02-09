@@ -9,7 +9,7 @@ import time
 
 # Create your views here.
 
-from .search_engine import Index, push_index_item, exec_query
+from .search_engine import Index, push_index_item, exec_query, QueryType
 import numpy as np
 import sys
 
@@ -43,8 +43,13 @@ class SearchEngine:
         return SearchEngine.index.size
 
     @staticmethod
-    def query(feat=None):
-        results = exec_query(SearchEngine.index, feat.tolist(), settings.MAX_RETURN_ITEM)
+    def query(feat):
+        results = exec_query(SearchEngine.index, feat.tolist(), QueryType.Linear, settings.MAX_RETURN_ITEM)
+        return results
+
+    @staticmethod
+    def query_re_rank(feat):
+        results = exec_query(SearchEngine.index, feat.tolist(), QueryType.LRS, settings.MAX_RETURN_ITEM)
         return results
 
     @staticmethod
@@ -123,7 +128,7 @@ class ResultMeta:
         self.height = height
 
 
-def result(request, id, from_db=None):
+def result(request, id, from_db=None, re_rank=None):
     try:
         if from_db == 'from_db':
             feature_db_image = Feature.objects.get(image=id, identity=settings.FEATURE_IDENTITY)
@@ -132,7 +137,10 @@ def result(request, id, from_db=None):
             user_upload_image = UserUploadImage.objects.get(id=id)
             feat_query = np.frombuffer(user_upload_image.feature, dtype='float32')
         start_time = time.time()
-        search_results = SearchEngine.query(feat=feat_query)
+        if re_rank == 're_rank':
+            search_results = SearchEngine.query_re_rank(feat=feat_query)
+        else:
+            search_results = SearchEngine.query(feat=feat_query)
         end_time = time.time()
         results = []
         for item in search_results:
@@ -143,6 +151,7 @@ def result(request, id, from_db=None):
             'time': '%.2f' % (end_time - start_time),
             'results': results,
             'from_db': from_db,
+            're_rank': re_rank,
         })
     except (UserUploadImage.DoesNotExist, Feature.DoesNotExist):
         raise Http404("Page Not Found")

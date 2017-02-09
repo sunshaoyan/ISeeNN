@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 using namespace std;
 
 struct IndexItem {
@@ -21,11 +22,13 @@ public:
     string get_id(size_t idx) const;
     const vector<float>& get_feature(size_t idx) const;
     size_t size() const;
+    size_t dimension();
 
     void push_item(string id, vector<float> feature);
 
 private:
     vector<IndexItem> items;
+    size_t dim;
 };
 
 inline string Index::get_id(size_t idx) const {

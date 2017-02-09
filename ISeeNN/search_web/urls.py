@@ -7,8 +7,11 @@ app_name = 'search_web'
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^upload/$', views.upload, name='upload'),
+    # The following url dispatchers are ugly. Revise them.
     url(r'^result/(?P<id>[a-zA-Z0-9]{24})$', views.result, name='result'),
     url(r'^result/(?P<id>[a-zA-Z0-9]{24})/(?P<from_db>from_db)$', views.result, name='result_from_db'),
+    url(r'^result/(?P<id>[a-zA-Z0-9]{24})/(?P<re_rank>re_rank)$', views.result, name='result_re_rank'),
+    url(r'^result/(?P<id>[a-zA-Z0-9]{24})/(?P<re_rank>re_rank)/(?P<from_db>from_db)$', views.result, name='result_re_rank_from_db'),
     url(r'^get_image/(?P<id>[a-zA-Z0-9]{24})$', views.get_image, name='get_image'),
     url(r'^get_thumbnail/(?P<id>[a-zA-Z0-9]{24})$', views.get_thumbnail, name='get_thumbnail'),
     url(r'^user_image/(?P<id>[a-zA-Z0-9]{24})$', views.user_image, name='user_image'),
