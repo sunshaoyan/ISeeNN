@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4)
 project(search_engine)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES PythonInterface.cpp Index.cpp Index.h Query.cpp Query.h)
 #set(SOURCE_FILES main.cpp Index.cpp Index.h Query.cpp Query.h)

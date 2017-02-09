@@ -32,9 +32,9 @@ void push_index_item(const boost::python::object& index_obj, const char* id, con
 unique_ptr<AbstractQuery> get_query(const QueryType& query_type, const Index* index) {
     switch (query_type) {
         case Linear:
-            return make_unique<LinearQuery>(index);
+            return unique_ptr<LinearQuery>(new LinearQuery(index));
         case LRS:
-            return make_unique<LRSQuery>(index);
+            return unique_ptr<LRSQuery>(new LRSQuery(index));
     }
 }
 
