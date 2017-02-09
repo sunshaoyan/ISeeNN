@@ -33,9 +33,9 @@ The Query You Uploaded: <br/>
 <div id="results">
     {% for result in results %}
         {% if from_db %}
-            <a href="{% url 'search_web:detail_from_db' result.id query_image from_db%}">
+            <a href="{% url 'search_web:detail_from_db' result.id query_image from_db%}" target="_blank">
         {% else %}
-            <a href="{% url 'search_web:detail' result.id query_image %}">
+            <a href="{% url 'search_web:detail' result.id query_image %}" target="_blank">
         {% endif %}
             <img class="list"
                  src="{% url 'search_web:get_thumbnail' result.id %}"
