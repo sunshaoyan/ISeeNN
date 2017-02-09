@@ -7,19 +7,65 @@
 
 #include "Index.h"
 #include <memory>
+#include <unordered_map>
+#include <functional>
+#include <string>
+
+struct ResultItem {
+	size_t id;
+	float score;
+};
 
 struct ScoreItem {
     string id;
     float score;
-    inline bool operator==(const ScoreItem& other){ return false; } // for converting to python list
+    inline bool operator==(const ScoreItem& other) { 
+    	return false; 
+    } // for converting to python list
 };
 
-class Query {
+
+class AbstractQuery {
+
 public:
-    Query(Index* index);
-    vector<ScoreItem> exec(const vector<float> &query_feature, const size_t return_list_size=0);
-private:
-    Index* m_index;
+	AbstractQuery(const Index *index) : _index(index) {
+
+    }
+
+	virtual vector<ScoreItem> exec(
+		const vector<float> &query_feature, 
+		const size_t return_list_size=0) const = 0;
+
+protected:
+	const Index* _index;
+};
+
+
+class LinearQuery: public AbstractQuery {
+
+public:
+    LinearQuery(const Index* index) : AbstractQuery(index) {
+
+	}
+
+    virtual vector<ScoreItem> exec(
+    	const vector<float> &query_feature, 
+    	const size_t return_list_size=0) const override;
+
+protected:
+	vector<ResultItem> linear_search(const vector<float> &query_feature) const;
+};
+
+
+class LRSQuery: public LinearQuery {
+public:
+    LRSQuery(const Index* index) : LinearQuery(index) {
+
+    }
+
+    virtual vector<ScoreItem> exec(
+            const vector<float> &query_feature,
+            const size_t return_list_size=0) const override;
 };
 
 

@@ -28,7 +28,14 @@ The Query You Uploaded: <br/>
     {% endif %}
 </div>
 <div>
-    Query time: {{ time }}s
+    <p>Query time: {{ time }}s</p>
+    {% if re_rank is None %}
+        {% if from_db %}
+            <p><a href="{% url 'search_web:result_re_rank_from_db' id=query_image from_db='from_db' re_rank='re_rank' %}">Re-rank</a></p>
+        {% else %}
+            <p><a href="{% url 'search_web:result_re_rank' id=query_image re_rank='re_rank' %}">Re-rank</a></p>
+        {% endif %}
+    {% endif %}
 </div>
 <div id="results">
     {% for result in results %}

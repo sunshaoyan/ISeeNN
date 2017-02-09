@@ -4,7 +4,7 @@
 
 #include "Index.h"
 
-Index::Index() : items() {
+Index::Index() : items(), dim(0) {
 
 }
 

@@ -25,9 +25,9 @@ int main() {
     std::chrono::time_point<std::chrono::system_clock> start, end;
     start = std::chrono::system_clock::now();
 
-    Query q(&index);
+    unique_ptr<AbstractQuery> q = make_unique<LRSQuery>(&index);
     vector<float> query(512);
-    vector<ScoreItem> scores = q.exec(query, 100000);
+    vector<ScoreItem> scores = q->exec(query, 300);
     end = std::chrono::system_clock::now();
 //    for_each(scores.begin(), scores.end(), [](shared_ptr<ScoreItem> item){cout << item->id << ", " << item->score << endl;});
     std::chrono::duration<double> elapsed_seconds = end-start;
