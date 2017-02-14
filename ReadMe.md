@@ -1,4 +1,7 @@
 # The Introduction to ISeeNN System
+
+[toc]
+
 This is a comprehensive document about our CNN based image retrieval system __ISeeNN__ building procedure.
 
 The phrase **ISeeNN** can be expanded as *I See (with) CNN*.
@@ -134,7 +137,7 @@ switched to db image_retrieval
 
 ### Django Development Environment
 
-We use Python to develop the web service, and to extract CNN features with [Tensorflow](https://www.tensorflow.org) Python interface.
+We use Python3 to develop the web service, and to extract CNN features with [Tensorflow](https://www.tensorflow.org) Python interface.
 
 In this part we will config Python with Django module for web service and its MongoDB backend 
 
@@ -154,11 +157,12 @@ $ cd image_retrieval
 $ source bin/activate
 ```
 
-Setup [Django](https://www.djangoproject.com), [MongoEngine](http://mongoengine.org), and [Pillow](http://pillow.readthedocs.io/en/latest/#):
+Setup [Django](https://www.djangoproject.com), [MongoEngine](http://mongoengine.org), [ski-image](http://scikit-image.org) and [Pillow](http://pillow.readthedocs.io/en/latest/#):
 
 ```bash
 $ pip install django
 $ pip install mongoengine
+$ pip install scikit-image
 $ pip install Pillow
 ```
 
@@ -169,8 +173,13 @@ Now we have Python environment as (depending on your own environment):
 ```bash
 $ pip freeze
 appdirs==1.4.0
+cycler==0.10.0
+dask==0.13.0
+decorator==4.0.11
 Django==1.10.5
+matplotlib==2.0.0
 mongoengine==0.11.0
+networkx==1.11
 numpy==1.12.0
 olefile==0.44
 packaging==16.8
@@ -178,8 +187,13 @@ Pillow==4.0.0
 protobuf==3.2.0
 pymongo==3.4.0
 pyparsing==2.1.10
+python-dateutil==2.6.0
+pytz==2016.10
+scikit-image==0.12.3
+scipy==0.18.1
 six==1.10.0
-tensorflow==0.12.1
+tensorflow-gpu==0.12.1
+toolz==0.8.2
 ```
 
 And let's start our **ISeeNN** project:
@@ -240,4 +254,78 @@ OK! now lanch the server by
 
 Then open your browser to brows ``http://localhost:8000`` to test it.
 
-### TBD
+### Boost Python Wrapper
+Our search engine backend is implemented with C++ for efficiency concern. To call this backend, we wrap the C++ code with Boost Python to be exposed as a Python module.
+
+Make sure to install boost-dev and boost-python-dev with python 3 support.
+
+For Ubuntu:
+
+```bash
+$ sudo apt-get install libboost-dev libboost-python-dev
+```
+
+For OSX: (it's important to set the flags below)
+
+```bash
+$ brew install boost
+$ brew install boost-python --with-python3 --without-python
+```
+
+For Suse Linux:
+
+```
+$ sudo zypper in boost-devel
+```
+
+To use these libraries, add these lines to your CMakeLists.txt:
+
+```c
+INCLUDE(FindPythonLibs)
+FIND_PACKAGE(PythonInterp)
+FIND_PACKAGE(PythonLibs)
+FIND_PACKAGE(Boost COMPONENTS python3)
+
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
+LINK_LIBRARIES(${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+
+PYTHON_ADD_MODULE(your_target ${SOURCE_FILES})
+```
+
+## To run the project
+
+There are three parts in this project: 
+
+* the web interface ``ISeeNN/``, including two web apps ``search_web/`` and ``image_server/``.
+* the indexer ``Indexer/`` that runs off-line, to index specifical image dataset into the database.
+* the search engine ``search_engine/`` implemented wit C++, which will be compiled to shared library to be used as a Python module in the web interface.
+
+To run the project, follow these steps:
+
+* setup environment as the previous chapter.
+* specify the mongodb user name and password in the ``ISeeNN/ISeeNN/settings.py`` and ``Indexer/indexer.py``
+* create ``image_server`` documents in your mongo shell. e.g.,
+
+```bash
+> db.image_server.insert({server_name: 'Amax', server_ip: '192.168.104.244'})
+```
+
+* index your target image dataset in local disks.
+
+	1) set the ``dir_name = ''``, ``server_name=''`` in ``Indexer/indexer.py``. Maybe you also want to specify normalizer type and model type. Currently this script is not well organized. We will make a revision in the furture.
+	
+	2) run ``cd Indexer && python indexer.py``
+	
+* compile and install the search engine backend:
+
+```bash
+$ cd search_engine && ./build.sh
+```
+
+* run the server
+
+```bash
+$ cd ISeeNN && ./manager.py runserver 0.0.0.0:8000
+```
+
+* Have fun!
