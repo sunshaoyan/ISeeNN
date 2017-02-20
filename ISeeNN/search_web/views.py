@@ -41,7 +41,7 @@ def load_index(identity):
         else:
             image_id_sets = [image_ids]
         for image_id_clips in image_id_sets:
-            for feature in Feature.objects(image__in=image_id_clips, identity=settings.FEATURE_IDENTITY).only('data').all():
+            for feature in Feature.objects(image__in=image_id_clips, identity=settings.FEATURE_IDENTITY).all():
                 if loaded % 10000 == 0:
                     print('%d / %d' % (loaded, count))
                 vec = np.frombuffer(feature.data, dtype='float32')
