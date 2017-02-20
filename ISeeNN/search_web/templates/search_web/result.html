@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ISEE NN Results</title>
     {% load staticfiles %}
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
@@ -28,27 +29,27 @@ The Query You Uploaded: <br/>
     {% endif %}
 </div>
 <div>
-    <p>Query time: {{ time }}s</p>
+    Query time: {{ time }}s. 
     {% if re_rank is None %}
         {% if from_db %}
-            <p><a href="{% url 'search_web:result_re_rank_from_db' id=query_image from_db='from_db' re_rank='re_rank' %}">Re-rank</a></p>
+            <a href="{% url 'search_web:result_re_rank_from_db' id=query_image from_db='from_db' re_rank='re_rank' %}">Click</a> to re-rank.
         {% else %}
-            <p><a href="{% url 'search_web:result_re_rank' id=query_image re_rank='re_rank' %}">Re-rank</a></p>
+            <a href="{% url 'search_web:result_re_rank' id=query_image re_rank='re_rank' %}">Click</a> to re-rank.
         {% endif %}
     {% endif %}
 </div>
 <div id="results">
     {% for result in results %}
         {% if from_db %}
-            <a href="{% url 'search_web:detail_from_db' result.id query_image from_db%}">
+            <a href="{% url 'search_web:detail_from_db' result.id query_image from_db%}" target="_blank">
         {% else %}
-            <a href="{% url 'search_web:detail' result.id query_image %}">
+            <a href="{% url 'search_web:detail' result.id query_image %}" target="_blank">
         {% endif %}
             <img class="list"
                  src="{% url 'search_web:get_thumbnail' result.id %}"
                  data-width="{{ result.width }}"
                  data-height="{{ result.height }}"
-                 title="{{ result.score }}"
+                 title="rank={{ forloop.counter }},score={{ result.score }}"
             />
         </a>
     {% endfor %}

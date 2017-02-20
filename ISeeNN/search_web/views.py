@@ -20,10 +20,35 @@ def load_index(identity):
     print("loading index...")
     print("This may take a while.")
     index = Index()
-    for feature in Feature.objects(identity=identity):
-        vec = np.frombuffer(feature.data, dtype='float32')
-        push_index_item(index, str(feature.image), vec.tolist())
-    print("loaded %d index items." % (index.size))
+    time_s = time.time()
+    for db in settings.DATASETS:
+        print("loading dataset %s" % db)
+        loaded = 0
+        images = DBImage.objects(source=db).only('id').all()
+        image_ids = [x.id for x in images]
+        time_m = time.time()
+        count = len(image_ids)
+        print("converted %d images in %.2fs" % (count, time_m - time_s))
+        segment_size = 500000
+        if count > segment_size:
+            start_id = 0
+            image_id_sets = []
+            while start_id + segment_size < count:
+                image_id_sets.append(image_ids[start_id:start_id + segment_size])
+                start_id += segment_size
+            if start_id < count:
+                image_id_sets.append(image_ids[start_id:])
+        else:
+            image_id_sets = [image_ids]
+        for image_id_clips in image_id_sets:
+            for feature in Feature.objects(image__in=image_id_clips, identity=settings.FEATURE_IDENTITY).only('data').all():
+                if loaded % 10000 == 0:
+                    print('%d / %d' % (loaded, count))
+                vec = np.frombuffer(feature.data, dtype='float32')
+                push_index_item(index, str(feature.image), vec.tolist())
+                loaded += 1
+    time_e = time.time()
+    print("loaded %d index items in %.2fs." % (index.size, time_e - time_s))
     return index
 
 def load_extractor():
