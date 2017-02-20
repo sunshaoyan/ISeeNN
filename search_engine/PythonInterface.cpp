@@ -9,9 +9,10 @@
 #include <boost/python/enum.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <boost/python/stl_iterator.hpp>
+#include <boost/python/numpy.hpp>
 #include <string>
 
-using namespace boost::python;
+using boost::python::numpy::ndarray;
 
 enum QueryType {
     Linear,
@@ -28,17 +29,24 @@ void push_index_item(const boost::python::object& index_obj, const char* id, con
     index->push_item(id, v);
 }
 
+void push_index_item(const boost::python::object& index_obj, const boost::python::list& ids, const ndarray& feats)
+{
+    size_t size = feats.shape(0);
+    size_t dim = feats.shape(2);
 
-unique_ptr<AbstractQuery> get_query(const QueryType& query_type, const Index* index) {
+}
+
+
+std::unique_ptr<AbstractQuery> get_query(const QueryType& query_type, const Index* index) {
     switch (query_type) {
         case Linear:
-            return unique_ptr<LinearQuery>(new LinearQuery(index));
+            return std::unique_ptr<LinearQuery>(new LinearQuery(index));
         case LRS:
-            return unique_ptr<LRSQuery>(new LRSQuery(index));
+            return std::unique_ptr<LRSQuery>(new LRSQuery(index));
     }
 }
 
-vector<ScoreItem> exec_query(const boost::python::object& index_obj,
+std::vector<ScoreItem> exec_query(const boost::python::object& index_obj,
                              const boost::python::list& query_feat,
                              const QueryType &query_type,
                              const size_t return_list_size=0)

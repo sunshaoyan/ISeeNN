@@ -24,7 +24,8 @@ public:
     size_t size() const;
     size_t dimension();
 
-    void push_item(string id, vector<float> feature);
+    inline void push_item(string &id, vector<float> &feature);
+    inline void push_item(const char *id, vector<float> &feature);
 
 private:
     vector<IndexItem> items;
@@ -43,5 +44,11 @@ inline size_t Index::size() const {
     return items.size();
 }
 
+inline void Index::push_item(string &id, vector<float> &feature) {
+    items.push_back({move(id), move(feature)});
+}
 
+inline void Index::push_item(const char *id, vector<float> &feature) {
+    items.push_back({move(string(id)), move(feature)});
+}
 #endif //SEARCH_ENGINE_INDEX_H
