@@ -9,10 +9,7 @@
 #include <boost/python/enum.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <boost/python/stl_iterator.hpp>
-#include <boost/python/numpy.hpp>
 #include <string>
-
-using boost::python::numpy::ndarray;
 
 enum QueryType {
     Linear,
@@ -27,13 +24,6 @@ void push_index_item(const boost::python::object& index_obj, const char* id, con
                                               boost::python::stl_input_iterator<float>());
 
     index->push_item(id, v);
-}
-
-void push_index_item(const boost::python::object& index_obj, const boost::python::list& ids, const ndarray& feats)
-{
-    size_t size = feats.shape(0);
-    size_t dim = feats.shape(2);
-
 }
 
 
