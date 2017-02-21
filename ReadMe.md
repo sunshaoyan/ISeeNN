@@ -1,11 +1,10 @@
 # The Introduction to ISeeNN System
 
-[toc]
-
 This is a comprehensive document about our CNN based image retrieval system __ISeeNN__ building procedure.
 
 The phrase **ISeeNN** can be expanded as *I See (with) CNN*.
 
+We provide an online demo [here](http://222.195.92.10:8000/search_web), which indexes [MirFlickr 1M dataset](http://press.liacs.nl/mirflickr/). It is only for demonstration purpose, and may not be always available.
 
 ## System Overview
 The system consists of __three__ principal components:
@@ -16,7 +15,15 @@ The system consists of __three__ principal components:
 
 The system is featured in:
 
-- Support multiple CNN models, feature types with dynamic switch- Support index update with new queries- Support specifying dataset coverage- Support user session to record feedback- Open API for new algorithms- Support image URL distribution from multiple internal serversThe framework of our system can be illustrated as:![](img/framework.png)
+- Support multiple CNN models, feature types with dynamic switch
+- Support index update with new queries
+- Support specifying dataset coverage
+- Support user session to record feedback
+- Open API for new algorithms
+- Support image URL distribution from multiple internal servers
+
+The framework of our system can be illustrated as:
+![](img/framework.png)
 
 ## Setup
 In this part, I will show the system setup details. 
