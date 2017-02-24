@@ -19,7 +19,7 @@ or
                  src="{% url 'search_web:get_thumbnail' result.id %}"
                  data-width="{{ result.width }}"
                  data-height="{{ result.height }}"
-                 title="{{ result.score }}"
+                 title="Rank {{ forloop.counter }}({{ result.score }})"
             />
         </a>
     {% endfor %}
