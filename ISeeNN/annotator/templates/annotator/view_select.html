@@ -16,7 +16,7 @@
                  src="{% url 'search_web:get_thumbnail' result.query_image_id %}"
                  data-width="{{ result.width }}"
                  data-height="{{ result.height }}"
-                 title=""
+                 title="{{ forloop.counter }}"
             />
         </a>
     {% endfor %}
