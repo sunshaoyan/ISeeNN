@@ -310,7 +310,8 @@ There are three parts in this project:
 To run the project, follow these steps:
 
 * setup environment as the previous chapter.
-* specify the mongodb user name and password in the ``ISeeNN/ISeeNN/settings.py`` and ``Indexer/indexer.py``
+* copy ``ISeeNN/IseeNN/personal_settings.py.example`` to ``ISeeNN/IseeNN/personal_settings.py``
+* specify the mongodb user name and password in the above setting file and ``Indexer/indexer.py``
 * create ``image_server`` documents in your mongo shell. e.g.,
 
 ```bash
@@ -319,7 +320,7 @@ To run the project, follow these steps:
 
 * index your target image dataset in local disks.
 
-	1) set the ``dir_name = ''``, ``server_name=''`` in ``Indexer/indexer.py``. Maybe you also want to specify normalizer type and model type. Currently this script is not well organized. We will make a revision in the furture.
+	1) set the ``dir_name = ''``, ``server_name=''`` in ``Indexer/indexer.py``. Maybe you also want to specify normalizer type and model type. Currently this script is not well organized. We will make a revision in the future.
 	
 	2) run ``cd Indexer && python indexer.py``
 	
