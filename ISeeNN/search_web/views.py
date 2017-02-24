@@ -21,32 +21,33 @@ def load_index(identity):
     print("This may take a while.")
     index = Index()
     time_s = time.time()
-    for db in settings.DATASETS:
-        print("loading dataset %s" % db)
-        loaded = 0
-        images = DBImage.objects(source=db).only('id').all()
-        image_ids = [x.id for x in images]
-        time_m = time.time()
-        count = len(image_ids)
-        print("converted %d images in %.2fs" % (count, time_m - time_s))
-        segment_size = 500000
-        if count > segment_size:
-            start_id = 0
-            image_id_sets = []
-            while start_id + segment_size < count:
-                image_id_sets.append(image_ids[start_id:start_id + segment_size])
-                start_id += segment_size
-            if start_id < count:
-                image_id_sets.append(image_ids[start_id:])
-        else:
-            image_id_sets = [image_ids]
-        for image_id_clips in image_id_sets:
-            for feature in Feature.objects(image__in=image_id_clips, identity=settings.FEATURE_IDENTITY).all():
-                if loaded % 10000 == 0:
-                    print('%d / %d' % (loaded, count))
-                vec = np.frombuffer(feature.data, dtype='float32')
-                push_index_item(index, str(feature.image), vec.tolist())
-                loaded += 1
+    if len(settings.DATASETS) == 0:
+        images = DBImage.objects().only('id').all()
+    else:
+        images = DBImage.objects(source__in=settings.DATASETS).only('id').all()
+    loaded = 0
+    image_ids = [x.id for x in images]
+    time_m = time.time()
+    count = len(image_ids)
+    print("converted %d images in %.2fs" % (count, time_m - time_s))
+    segment_size = 500000
+    if count > segment_size:
+        start_id = 0
+        image_id_sets = []
+        while start_id + segment_size < count:
+            image_id_sets.append(image_ids[start_id:start_id + segment_size])
+            start_id += segment_size
+        if start_id < count:
+            image_id_sets.append(image_ids[start_id:])
+    else:
+        image_id_sets = [image_ids]
+    for image_id_clips in image_id_sets:
+        for feature in Feature.objects(image__in=image_id_clips, identity=settings.FEATURE_IDENTITY).all():
+            if loaded % 10000 == 0:
+                print('%d / %d' % (loaded, count))
+            vec = np.frombuffer(feature.data, dtype='float32')
+            push_index_item(index, str(feature.image), vec.tolist())
+            loaded += 1
     time_e = time.time()
     print("loaded %d index items in %.2fs." % (index.size, time_e - time_s))
     return index
@@ -153,6 +154,26 @@ class ResultMeta:
         self.height = height
 
 
+def get_results(feat, re_rank=False):
+    if re_rank:
+        search_results = SearchEngine.query_re_rank(feat)
+    else:
+        search_results = SearchEngine.query(feat)
+    results = []
+    for item in search_results:
+        (w, h) = get_image_meta(item.id)
+        results.append(ResultMeta(item.id, item.score, w, h))
+    return results
+
+
+def get_index_id(idx):
+    return SearchEngine.index.get_id(idx)
+
+
+def get_index_count():
+    return SearchEngine.index.size
+
+
 def result(request, id, from_db=None, re_rank=None):
     try:
         if from_db == 'from_db':
@@ -162,15 +183,8 @@ def result(request, id, from_db=None, re_rank=None):
             user_upload_image = UserUploadImage.objects.get(id=id)
             feat_query = np.frombuffer(user_upload_image.feature, dtype='float32')
         start_time = time.time()
-        if re_rank == 're_rank':
-            search_results = SearchEngine.query_re_rank(feat=feat_query)
-        else:
-            search_results = SearchEngine.query(feat=feat_query)
+        results = get_results(feat=feat_query, re_rank=(re_rank == 're_rank'))
         end_time = time.time()
-        results = []
-        for item in search_results:
-            (w, h) = get_image_meta(item.id)
-            results.append(ResultMeta(item.id, item.score, w, h))
         return render(request, 'search_web/result.html', {
             'query_image': id,
             'time': '%.2f' % (end_time - start_time),
