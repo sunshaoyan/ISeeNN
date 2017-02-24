@@ -4,6 +4,7 @@
 	/*margin-right: 1px;*/
 }
 
-a {
+a, a:visited{
 	text-decoration: none;
+	color: blue;
 }
