@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <title>Annotator Select</title>
+    {% load staticfiles %}
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="{% static "annotator/js/result_arrange.js" %}"></script>
+    <link rel="stylesheet" href="{% static "annotator/css/result_arrange.css"%}">
+</head>
+<body>
+<a href="{% url 'annotator:confirm_select' query %}">Add this query</a>
+<div id="results">
+    {% for result in results %}
+        <a href="{% url 'annotator:select_id' result.id %}">
+            <img class="list"
+                 src="{% url 'search_web:get_thumbnail' result.id %}"
+                 data-width="{{ result.width }}"
+                 data-height="{{ result.height }}"
+                 title="{{ result.score }}"
+            />
+        </a>
+    {% endfor %}
+</div>
+<a href="{% url 'annotator:logout' %}">Logout</a>
+</body>
+</html>

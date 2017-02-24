@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Annotator Login</title>
+</head>
+<body>
+<h3>Login</h3>
+<form action="{% url 'annotator:login_submit' %}" method="POST">
+    {% csrf_token %}
+    {{ login_form }}
+    <input type="submit" />
+</form>
+<h3>Or if you do not have account, register here: </h3>
+<form action="{% url 'annotator:register' %}" method="POST">
+    {% csrf_token %}
+    {{ register_form }}
+    <input type="submit">
+</form>
+<p>(Both user name and password should be longer than 3 characters.)</p>
+{% if error_message %}
+<p style="color:red">{{ error_message }}</p>
+{% endif %}
+{% if info_message %}
+    <p style="color: green">{{ info_message }}</p>
+{% endif %}
+</body>
+</html>

@@ -1,0 +1,45 @@
+body {
+    text-align: center;
+}
+
+a, a:visited {
+    color: blue;
+}
+
+.container {
+    text-align: center;
+    width: 100%;
+    height: 200px;
+    margin: 40px 0;
+}
+
+.container img {
+    height: 100%;
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hidden {
+    display: none;
+}
+
+.container a {
+	text-decoration: none;
+}
+
+#scores li{
+    display: inline-block;
+    margin: 0 32px 0 0;
+    padding: 0;
+}
+
+#pager {
+    margin-top: 36px;
+}
+
+#pager li {
+    display: inline-block;
+    margin: 0 60px 0 0;
+    padding: 0;
+}

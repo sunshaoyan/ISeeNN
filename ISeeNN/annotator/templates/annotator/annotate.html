@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Annotate</title>
+    {% load staticfiles %}
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="{% static "annotator/js/annotate.js" %}"></script>
+    <link rel="stylesheet" href="{% static "annotator/css/annotate.css"%}">
+</head>
+<body>
+    <p>Welcome, {{ user_name }}! <a href="{% url 'annotator:logout' %}">logout</a></p>
+    <p>
+        You are labeling the {{ label_index }}/{{ label_count }} query,
+        <span id="target_status"></span>
+        <span id="ticker"></span>
+    </p>
+    <p>tip: if you cannot load some images, you can just resize your window to reload, instead of refresh the page.</p>
+    <p>tip: you can use keys in (*) for corresponding operations.</p>
+    <div id="pager">
+        <ul>
+            <li><a href="#" onclick="previous(); return false">[Previous(9)]</a></li>
+            <li><a href="#" onclick="next(); return false">[Next(0)]</a></li>
+        </ul>
+    </div>
+    <div id="annotation_id" class="hidden">{{ annotation_id }}</div>
+    <div class="container">
+        <a href="{% url 'search_web:get_image' query_id%}" target="_blank">
+            <img src="{% url 'search_web:get_thumbnail' query_id%}" alt="">
+        </a>
+        {% for result in annotation_list %}
+            <a href="{% url 'search_web:get_image' result %}" target="_blank" class="targets">
+                <img class="list" src="{% url 'search_web:get_thumbnail' result %}"/>
+            </a>
+        {% endfor %}
+    </div>
+    <div style="clear: both;"></div>
+    <div id="scores">
+        <ul>
+            <li><a href="#" onclick="score(1);return false;">[Irrelevant(1)]</a></li>
+            <li><a href="#" onclick="score(2);return false;">[Relevant(2)]</a></li>
+            <li><a href="#" onclick="score(3);return false;">[Very Relevant(3)]</a></li>
+        </ul>
+    </div>
+
+    <p id="score_display"></p>
+    <form action="{%  url 'annotator:annotate_submit' %}" method="post" class="hidden" id="submit_form">
+        {% csrf_token %}
+        <input type="submit">
+    </form>
+</body>
