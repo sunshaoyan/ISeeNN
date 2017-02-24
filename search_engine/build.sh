@@ -5,4 +5,4 @@ cmake .. -DCMAKE_INSTALL_PREFIX=../../ -DCMAKE_BUILD_TYPE=Release
 make
 make install
 cd ..
-# rm -rf build
+rm -rf build
