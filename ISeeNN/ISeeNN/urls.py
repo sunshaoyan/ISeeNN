@@ -19,5 +19,6 @@ from django.conf.urls import url, include
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
     url(r'^image_server/', include('image_server.urls')),
-    url(r'^search_web/', include('search_web.urls'))
+    url(r'^search_web/', include('search_web.urls')),
+    url(r'^annotator/', include('annotator.urls')),
 ]
