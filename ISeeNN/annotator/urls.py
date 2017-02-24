@@ -8,6 +8,9 @@ urlpatterns = [
     url(r'^select$', views.select, name='select'),
     url(r'^select/(?P<image_id>[a-zA-Z0-9]{24})$', views.select, name='select_id'),
     url(r'^confirm_select/(?P<image_id>[a-zA-Z0-9]{24})$', views.confirm_select, name='confirm_select'),
+    url(r'^view_selected$', views.view_selected, name='view_selected'),
+    url(r'^view_selected_detail/(?P<query_id>[a-zA-Z0-9]{24})$', views.view_selected_detail, name='view_selected_detail'),
+    url(r'^remove_select/(?P<query_id>[a-zA-Z0-9]{24})$', views.remove_select, name='remove_select'),
 
     url(r'^login$', views.login, name='login'),
     url(r'^login/(?P<error>[0-3])$', views.login, name='login_error'),

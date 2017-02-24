@@ -69,6 +69,36 @@ def confirm_select(request, image_id):
     anno_query.save()
     return HttpResponseRedirect(reverse('annotator:select'))
 
+@authorize_user
+@authorize_admin
+def view_selected(request):
+    anno_queries = AnnoQuery.objects.all().only('query_image_id')
+    return render(request, 'annotator/view_select.html', {
+        'queries': anno_queries
+    })
+
+
+@authorize_user
+@authorize_admin
+def view_selected_detail(request, query_id):
+    feature = Feature.objects.get(identity=settings.FEATURE_IDENTITY, image=query_id)
+    query_feat = np.frombuffer(feature.data, dtype='float32')
+    results = get_results(query_feat)
+    return render(request, 'annotator/view_select_detail.html', {
+        'query': query_id,
+        'results': results,
+    })
+
+@authorize_user
+@authorize_admin
+def remove_select(request, query_id):
+    try:
+        anno_query = AnnoQuery.objects.get(query_image_id=query_id)
+        anno_query.delete()
+    except:
+        pass
+    return HttpResponseRedirect(reverse('annotator:view_selected'))
+
 
 def login(request, error=None, info=None):
     render_dict = {

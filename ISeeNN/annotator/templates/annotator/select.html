@@ -9,9 +9,9 @@
     <link rel="stylesheet" href="{% static "annotator/css/result_arrange.css"%}">
 </head>
 <body>
-<a href="{% url 'annotator:confirm_select' query %}">Add this query</a>
-or
-<a href="{% url 'annotator:select' %}">Random Another</a>
+<a href="{% url 'annotator:confirm_select' query %}" style="float:left"><h5>Add this query</h5></a>
+<a href="{% url 'annotator:select' %}" style="float:right"><h5>Random Another</h5></a>
+<div style="clear: both;"></div>
 <div id="results">
     {% for result in results %}
         <a href="{% url 'annotator:select_id' result.id %}">
