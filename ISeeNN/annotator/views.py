@@ -63,7 +63,7 @@ def confirm_select(request, image_id):
     feature = Feature.objects.get(identity=settings.FEATURE_IDENTITY, image=image_id)
     query_feat = np.frombuffer(feature.data, dtype='float32')
     results = get_results(query_feat)
-    result_list = [ObjectId(x.id) for x in results[:100]]
+    result_list = [ObjectId(x.id) for x in results]
     result_list = np.random.permutation(result_list).tolist()
     anno_query = AnnoQuery(query_image_id = ObjectId(image_id), target_image_ids = result_list)
     anno_query.save()
