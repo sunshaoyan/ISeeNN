@@ -59,7 +59,8 @@ BOOST_PYTHON_MODULE(search_engine)
             .export_values()
             ;
     class_<Index>("Index")
-            .def_readonly("size", &Index::size);
+            .def_readonly("size", &Index::size)
+            .def("get_id", &Index::get_id);
 
     class_<ScoreItem>("ScoreItem")
             .def_readonly("id", &ScoreItem::id)
