@@ -10,6 +10,8 @@
 </head>
 <body>
 <a href="{% url 'annotator:confirm_select' query %}">Add this query</a>
+or
+<a href="{% url 'annotator:select' %}">Random Another</a>
 <div id="results">
     {% for result in results %}
         <a href="{% url 'annotator:select_id' result.id %}">
