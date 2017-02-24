@@ -1,6 +1,6 @@
 from django.shortcuts import render, reverse
 from django.conf import settings
-from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 import random
 import numpy as np
 from bson import ObjectId
@@ -87,9 +87,18 @@ def view_selected(request):
 @authorize_user
 @authorize_admin
 def view_selected_detail(request, query_id):
-    feature = Feature.objects.get(identity=settings.FEATURE_IDENTITY, image=query_id)
-    query_feat = np.frombuffer(feature.data, dtype='float32')
-    results = get_results(query_feat)
+    try:
+        anno_query = AnnoQuery.objects.get(query_image_id=query_id)
+    except AnnoQuery.DoesNotExist:
+        return HttpResponseNotFound("Resource not available")
+    results = []
+    for image_id in anno_query.target_image_ids:
+        (width, height) = get_image_meta(image_id)
+        results.append({
+            'id': image_id,
+            'width': width,
+            'height': height,
+        })
     return render(request, 'annotator/view_select_detail.html', {
         'query': query_id,
         'results': results,
