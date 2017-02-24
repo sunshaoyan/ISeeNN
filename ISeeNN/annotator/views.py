@@ -9,7 +9,7 @@ import json
 # Create your views here.
 
 from search_web.models import Feature
-from search_web.views import get_results, get_index_id, get_index_count
+from search_web.views import get_results, get_index_id, get_index_count, get_image_meta
 from .models import AnnoQuery, AnnoUser, AnnoAnnotation
 from .models import LoginForm, RegisterForm, AnnotateForm
 
@@ -73,8 +73,14 @@ def confirm_select(request, image_id):
 @authorize_admin
 def view_selected(request):
     anno_queries = AnnoQuery.objects.all().only('query_image_id')
+    results = []
+    for query in anno_queries:
+        (width, height) = get_image_meta(query.query_image_id)
+        results.append({'query_image_id': query.query_image_id,
+                        'width': width,
+                        'height': height})
     return render(request, 'annotator/view_select.html', {
-        'queries': anno_queries
+        'queries': results
     })
 
 
