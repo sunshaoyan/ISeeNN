@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 import mongoengine
+from . import personal_settings as ps
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,7 +27,7 @@ SECRET_KEY = '%9rv%w=ir8uhu*-9(=gikvmk65=9gh@vw=9!!s(x9_(o^0e-+i'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'image_server.apps.ImageServerConfig',
     'search_web.apps.WebConfig',
+    'annotator.apps.AnnotatorConfig',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +53,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.file'
 
 ROOT_URLCONF = 'ISeeNN.urls'
 
@@ -82,15 +86,7 @@ DATABASES = {
     }
 }
 
-_MONGODB_USER = 'webclient'
-_MONGODB_PASSWD = 'xxxxxxxxxxxxxx' # change your password here
-_MONGODB_HOST = '127.0.0.1'
-_MONGODB_NAME = 'image_retrieval'
-_MONGODB_DATABASE_HOST = \
-    'mongodb://%s:%s@%s/%s' \
-    % (_MONGODB_USER, _MONGODB_PASSWD, _MONGODB_HOST, _MONGODB_NAME)
-
-mongoengine.connect(_MONGODB_NAME, host=_MONGODB_DATABASE_HOST)
+mongoengine.connect(ps._MONGODB_NAME, host=ps._MONGODB_DATABASE_HOST)
 
 
 # Password validation
@@ -131,11 +127,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-SERVER_NAME = 'Macbook' # Change the server host name here on the central server and all image servers
-FEATURE_MODEL = 'VGG16P5'
-INPUT_TYPE = 'RESIZE' # options are: RESIZE, NO_RESIZE
-INPUT_SIZE = (224, 224) # required only if INPUT_TYPE == RESIZE
-NORMALIZER_TYPE = 'ROOT' # options are: ROOT, L2
-FEATURE_IDENTITY = 'VGG16P5_resize' # should be consistent with FEATURE_MODEL and INPUT_TYPE
-MAX_RETURN_ITEM = 300 # set as 0 if you want retrieve all. WARNING this may cause your browser crash if the database size is large
-DATASETS = ['MirFlickr'] # the list of dataset you want to retrieval within
+SERVER_NAME = ps.SERVER_NAME # Change the server host name here on the central server and all image servers
+FEATURE_MODEL = ps.FEATURE_MODEL
+INPUT_TYPE = ps.INPUT_TYPE # options are: RESIZE, NO_RESIZE
+INPUT_SIZE = ps.INPUT_SIZE # required only if INPUT_TYPE == RESIZE
+NORMALIZER_TYPE = ps.NORMALIZER_TYPE # options are: ROOT, L2
+FEATURE_IDENTITY = ps.FEATURE_IDENTITY # should be consistent with FEATURE_MODEL and INPUT_TYPE
+MAX_RETURN_ITEM = ps.MAX_RETURN_ITEM # set as 0 if you want retrieve all. WARNING this may cause your browser crash if the database size is large
+DATASETS = ps.DATASETS # the list of dataset you want to retrieval within

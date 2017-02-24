@@ -1,0 +1,22 @@
+""" Database settings """
+_MONGODB_USER = 'webclient'
+_MONGODB_PASSWD = 'xxxxxxxxxxx' # change your password here
+_MONGODB_HOST = '127.0.0.1'
+_MONGODB_NAME = 'image_retrieval'
+_MONGODB_DATABASE_HOST = \
+    'mongodb://%s:%s@%s/%s' \
+    % (_MONGODB_USER, _MONGODB_PASSWD, _MONGODB_HOST, _MONGODB_NAME)
+
+""" Current server settings """
+SERVER_NAME = 'Macbook' # Change the server host name here on the central server and all image servers
+
+
+""" Retrieval parameters """
+
+FEATURE_MODEL = 'VGG16P5'
+INPUT_TYPE = 'RESIZE' # options are: RESIZE, NO_RESIZE
+INPUT_SIZE = (224, 224) # required only if INPUT_TYPE == RESIZE
+NORMALIZER_TYPE = 'ROOT' # options are: ROOT, L2
+FEATURE_IDENTITY = 'VGG16P5_resize' # should be consistent with FEATURE_MODEL and INPUT_TYPE
+MAX_RETURN_ITEM = 300 # set as 0 if you want retrieve all. WARNING this may cause your browser crash if the database size is large
+DATASETS = ['MirFlickr'] # the list of dataset you want to retrieval within
