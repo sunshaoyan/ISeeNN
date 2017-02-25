@@ -15,8 +15,13 @@
         <span id="target_status"></span>
         <span id="ticker"></span>
     </p>
-    <p>tip: if you cannot load some images, you can just resize your window to reload, instead of refresh the page.</p>
-    <p>tip: you can use keys in (*) for corresponding operations.</p>
+    <div class="tips">
+        <ol>
+            <li>If you cannot load some images, you can just resize your window to reload.</li>
+            <li>You can use keys in (*) for corresponding operations.</li>
+            <li>Results won't be saved unless you complete one query! DO NOT refresh before that.</li>
+        </ol>
+    </div>
     <div id="pager">
         <ul>
             <li><a href="#" onclick="previous(); return false">[Previous(9)]</a></li>
@@ -37,9 +42,11 @@
     <div style="clear: both;"></div>
     <div id="scores">
         <ul>
-            <li><a href="#" onclick="score(1);return false;">[Irrelevant(1)]</a></li>
-            <li><a href="#" onclick="score(2);return false;">[Relevant(2)]</a></li>
-            <li><a href="#" onclick="score(3);return false;">[Very Relevant(3)]</a></li>
+            <li><a href="#" onclick="score(1);return false;">[WTF?(1)]</a></li>
+            <li><a href="#" onclick="score(2);return false;">[Irrelevant(2)]</a></li>
+            <li><a href="#" onclick="score(3);return false;">[Relevant(3)]</a></li>
+            <li><a href="#" onclick="score(4);return false;">[Very Relevant(4)]</a></li>
+            <li><a href="#" onclick="score(5);return false;">[Nice Match!(5)]</a></li>
         </ul>
     </div>
 

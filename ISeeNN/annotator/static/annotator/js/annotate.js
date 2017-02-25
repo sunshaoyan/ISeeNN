@@ -13,14 +13,12 @@ function set_visible(id) {
     if (id <= scores.length - 1 && id >= 0) {
         score_text = ''
         switch(scores[id]) {
+            case 5:
+            case 4:
             case 3:
-                score_text = 'Very Relevant'
-                break
             case 2:
-                score_text = 'Relevant'
-                break
             case 1:
-                score_text = 'Irrelevant'
+                score_text = scores[id]
                 break
             default:
                 score_text = 'Undefined'
@@ -108,6 +106,12 @@ function set_key_events() {
                 break
             case 51: // 3
                 score(3)
+                break
+            case 52: // 4
+                score(4)
+                break
+            case 53: // 5
+                score(5)
                 break
             default:
                 break

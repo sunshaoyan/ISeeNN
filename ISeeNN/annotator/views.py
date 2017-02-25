@@ -48,6 +48,7 @@ def select(request, image_id=None):
         count = get_index_count()
         idx = random.randint(0, count-1)
         image_id = get_index_id(idx)
+        return HttpResponseRedirect(reverse('annotator:select_id', kwargs={'image_id': image_id}))
     feature = Feature.objects.get(identity=settings.FEATURE_IDENTITY, image=image_id)
     query_feat = np.frombuffer(feature.data, dtype='float32')
     results = get_results(query_feat)

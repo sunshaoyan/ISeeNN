@@ -43,3 +43,10 @@ a, a:visited {
     margin: 0 60px 0 0;
     padding: 0;
 }
+
+.tips {
+    text-align: left;
+    width: 600px;
+    margin: 0 auto;
+    border: 1px solid black;
+}
