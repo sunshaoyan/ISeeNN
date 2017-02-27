@@ -259,7 +259,7 @@ OK! now lanch the server by
 ./manage.py runserver 8000
 ```
 
-Then open your browser to brows ``http://localhost:8000`` to test it.
+Then open your browser to browse ``http://localhost:8000`` to test it.
 
 ### Boost Python Wrapper
 Our search engine backend is implemented with C++ for efficiency concern. To call this backend, we wrap the C++ code with Boost Python to be exposed as a Python module.
