@@ -6,6 +6,8 @@ from django.conf import settings
 from django.urls import reverse
 import urllib.request, urllib.error
 import time
+from PIL import Image
+from io import BytesIO
 
 # Create your views here.
 
@@ -196,10 +198,30 @@ def result(request, id, from_db=None, re_rank=None):
         raise Http404("Page Not Found")
 
 
+def handle_exif(image_file):
+    with Image.open(image_file) as image:
+        orientation_key = 274
+        exif = image._getexif()
+        format = image.format
+        if exif and orientation_key in exif:
+            orientation = exif[orientation_key]
+            rotate_values = {
+                3: Image.ROTATE_180,
+                6: Image.ROTATE_270,
+                8: Image.ROTATE_90
+            }
+            if orientation in rotate_values:
+                image = image.transpose(rotate_values[orientation])
+        image_io = BytesIO()
+        image.save(image_io, format)
+        return image_io
+
+
 def handle_uploaded_image(request):
     image_file = request.FILES['image_file']
     user_upload_image = UserUploadImage()
-    user_upload_image.data.put(image_file)
+    image_io = handle_exif(image_file)
+    user_upload_image.data.put(image_io)
     feat_query = SearchEngine.extract(user_upload_image.data.get())
     user_upload_image.feature = feat_query.tobytes()
     user_upload_image.identity = settings.FEATURE_IDENTITY
