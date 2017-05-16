@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ISEE NN Results</title>
     {% load staticfiles %}
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script type="text/javascript" src="{% static "search_web/js/result_arrange.js" %}"></script>
-    <link rel="stylesheet" href="{% static "search_web/css/result_arrange.css"%}">
+    <script type="text/javascript" src="{% static 'search_web/js/result_arrange.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'search_web/css/result_arrange.css'%}">
 </head>
 <body>
 {% if query_image %}
@@ -38,6 +38,22 @@ The Query You Uploaded: <br/>
         {% endif %}
     {% endif %}
 </div>
+
+{% if aesthetic %}
+
+<div>
+    <p>
+        Aesthetic score: {{ aesthetic_score }}
+    </p>
+    <ul>
+        {% for tag in aesthetic_tag %}
+        <li>{{ tag }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endif %}
+
 <div id="results">
     {% for result in results %}
         {% if from_db %}

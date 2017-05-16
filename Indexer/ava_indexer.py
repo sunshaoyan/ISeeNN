@@ -81,7 +81,8 @@ with open(AVA_file, 'r') as f:
                 path=img_filename,
                 width=im.width,
                 height=im.height,
-                mime_type='image/' + im.format.lower()
+                mime_type='image/' + im.format.lower(),
+                source='AVA'
             )
             db_image.save()
             image_id = db_image.pk

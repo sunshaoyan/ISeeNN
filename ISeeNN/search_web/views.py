@@ -6,6 +6,7 @@ from django.conf import settings
 from django.urls import reverse
 import urllib.request, urllib.error
 import time
+import math
 from PIL import Image
 from io import BytesIO
 
@@ -16,7 +17,7 @@ import numpy as np
 import sys
 
 from .feature_extractor import ResizeExtractor, NoResizeExtractor, NormalizerFactory
-from .models import Feature, DBImage, ImageServer, ImageUploadForm, UserUploadImage
+from .models import Feature, DBImage, ImageServer, ImageUploadForm, UserUploadImage, AestheticInfo
 
 def load_index(identity):
     print("loading index...")
@@ -117,13 +118,15 @@ def get_thumbnail(request, id):
             port = request.META['SERVER_PORT']
             url_ext = reverse('image_server:get_thumbnail', args=(str(id) ,))
             remote_url = 'http://' + ip + ':' + str(port) + url_ext
+            print(remote_url)
             image_data = urllib.request.urlopen(remote_url).read()
             return HttpResponse(image_data, content_type=mime_type)
         except ImageServer.DoesNotExist:
             return HttpResponseServerError("Image Server Does Not Exist!")
     except DBImage.DoesNotExist:
         raise Http404("Image Not Found")
-    except:
+    except Exception as e:
+        print(e)
         return HttpResponseGone("Image Moved")
 
 
@@ -143,17 +146,31 @@ def index(request):
     return render(request, 'search_web/index.html')
 
 
-def get_image_meta(id):
-    dbimage = DBImage.objects.get(pk=id)
-    return (dbimage.width, dbimage.height)
-
-
 class ResultMeta:
-    def __init__(self, id, score, width, height):
+    def __init__(self, id, score=0, width=0, height=0, aesthetic_tag=[], aesthetic_score=0.0):
         self.id = id
         self.score = score
         self.width = width
         self.height = height
+        self.aesthetic_tag = aesthetic_tag
+        self.aesthetic_score = aesthetic_score
+
+
+def get_image_meta(id):
+    dbimage = DBImage.objects.get(pk=id)
+    if settings.AESTHETIC:
+        try:
+            aesthetic_info = AestheticInfo.objects.get(image=id)
+            return ResultMeta(
+                id=id,
+                width=dbimage.width,
+                height=dbimage.height,
+                aesthetic_tag=aesthetic_info.tags,
+                aesthetic_score=aesthetic_info.score)
+        except AestheticInfo.DoesNotExist:
+            return None
+    else:
+        return ResultMeta(id=id, width=dbimage.width, height=dbimage.height)
 
 
 def get_results(feat, re_rank=False):
@@ -163,8 +180,11 @@ def get_results(feat, re_rank=False):
         search_results = SearchEngine.query(feat)
     results = []
     for item in search_results:
-        (w, h) = get_image_meta(item.id)
-        results.append(ResultMeta(item.id, item.score, w, h))
+        result_meta = get_image_meta(item.id)
+        if not result_meta:
+            continue
+        result_meta.score = item.score
+        results.append(result_meta)
     return results
 
 
@@ -186,14 +206,34 @@ def result(request, id, from_db=None, re_rank=None):
             feat_query = np.frombuffer(user_upload_image.feature, dtype='float32')
         start_time = time.time()
         results = get_results(feat=feat_query, re_rank=(re_rank == 're_rank'))
-        end_time = time.time()
-        return render(request, 'search_web/result.html', {
+        result_dict = {
             'query_image': id,
-            'time': '%.2f' % (end_time - start_time),
             'results': results,
             'from_db': from_db,
             're_rank': re_rank,
-        })
+            'aesthetic': settings.AESTHETIC,
+        }
+        if settings.AESTHETIC:
+            tag_dict = {}
+            aesthetic_score = 0
+            aesthetic_score_N = 0
+            for i in range(len(results)):
+                for tag in results[i].aesthetic_tag:
+                    if tag in tag_dict:
+                        tag_dict[tag] += 1/math.log2(i+2)
+                    else:
+                        tag_dict[tag] = 1/math.log2(i+2)
+                aesthetic_score += results[i].aesthetic_score/math.log2(i+2)
+                aesthetic_score_N += 1/math.log2(i+2)
+            result_dict['aesthetic_score'] = '%.2f' % (aesthetic_score / aesthetic_score_N)
+            result_dict['aesthetic_tag'] = aesthetic_score / aesthetic_score_N
+            st = sorted(tag_dict.items(), key=lambda d: d[1], reverse=True)
+            result_dict['aesthetic_tag'] = []
+            for i in range(min(len(st), 5)):
+                result_dict['aesthetic_tag'].append(st[i][0] + ' -- ' + '%.2f' % (st[i][1]/aesthetic_score_N))
+        end_time = time.time()
+        result_dict['time'] = '%.2f' % (end_time - start_time)
+        return render(request, 'search_web/result.html', result_dict)
     except (UserUploadImage.DoesNotExist, Feature.DoesNotExist):
         raise Http404("Page Not Found")
 
@@ -255,12 +295,22 @@ def detail(request, image_id, user_upload_id, from_db=None):
         feature_db_image = Feature.objects.get(image=image_id, identity=settings.FEATURE_IDENTITY)
         feat_db_image = np.frombuffer(feature_db_image.data, dtype='float32')
         similarity = np.inner(feat_db_image, feat_user_image)
-        return render(request, 'search_web/detail.html', {
+        result_dict = {
             'similarity': '%.4f' % similarity,
             'user_upload_image_id': user_upload_id,
             'db_image': db_image,
             'from_db': from_db
-        })
+        }
+        if settings.AESTHETIC:
+            try:
+                aesthetic_info = AestheticInfo.objects.get(image=image_id)
+                result_dict['aesthetic'] = {
+                    'tags': aesthetic_info.tags,
+                    'score': '%.2f' % aesthetic_info.score
+                }
+            except:
+                pass
+        return render(request, 'search_web/detail.html', result_dict)
     except (DBImage.DoesNotExist, UserUploadImage.DoesNotExist):
         raise Http404
     except Feature.DoesNotExist:
