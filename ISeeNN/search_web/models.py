@@ -63,3 +63,8 @@ class UserUploadImage(Document):
 class ImageUploadForm(forms.Form):
     image_file = forms.ImageField()
 
+
+class AestheticInfo(Document):
+    image = fields.ObjectIdField(required=True)
+    tags = fields.ListField()
+    score = fields.FloatField(required=True)

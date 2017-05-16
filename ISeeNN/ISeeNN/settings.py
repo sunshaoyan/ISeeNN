@@ -135,3 +135,5 @@ NORMALIZER_TYPE = ps.NORMALIZER_TYPE # options are: ROOT, L2
 FEATURE_IDENTITY = ps.FEATURE_IDENTITY # should be consistent with FEATURE_MODEL and INPUT_TYPE
 MAX_RETURN_ITEM = ps.MAX_RETURN_ITEM # set as 0 if you want retrieve all. WARNING this may cause your browser crash if the database size is large
 DATASETS = ps.DATASETS # the list of dataset you want to retrieval within
+
+AESTHETIC = ps.AESTHETIC # whether to perform aesthetic evaluation

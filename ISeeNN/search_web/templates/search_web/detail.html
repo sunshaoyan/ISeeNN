@@ -23,6 +23,11 @@
     <p>
         Info: width = {{ db_image.width }}, height = {{ db_image.height }}{% if db_image.source %}, Source = {{ db_image.source }}{% endif %}
     </p>
+    {% if aesthetic %}
+    <p>
+        Aesthetic score: {{ aesthetic.score }} | tags: {% for tag in aesthetic.tags %}[{{ tag }}] {% endfor %}
+    </p>
+    {% endif %}
     <img src="{% url 'search_web:get_image' id=db_image.id %}" alt="">
 </div>
 </body>

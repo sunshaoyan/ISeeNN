@@ -16,3 +16,9 @@ class Feature(Document):
             }
         ]
     }
+
+
+class AestheticInfo(Document):
+    image = fields.ObjectIdField(required=True)
+    tags = fields.ListField()
+    score = fields.FloatField(required=True)
